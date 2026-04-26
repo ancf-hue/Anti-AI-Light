@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,viewport-fit=cover">
+<link rel="icon" href="favicon.ico">
+<title>Анти-ИИ Свет</title>
+<style>
+/* Global Reset & Base */
+*{margin:0;padding:0;box-sizing:border-box;user-select:none;-webkit-tap-highlight-color:transparent}
+body{background:#000;display:flex;justify-content:center;align-items:center;min-height:100vh;font-family:system-ui,-apple-system,sans-serif}
+.screen{width:100vw;height:100vh;max-width:450px;max-height:800px;aspect-ratio:9/16;background:#0b1120;position:relative;overflow:hidden}
+
+/* Pages & Navigation */
+.page{position:absolute;top:0;left:0;width:100%;height:100%;opacity:0;pointer-events:none;transition:opacity .4s ease;z-index:1}
+.page.active{opacity:1;pointer-events:all;z-index:10}
+.dots{position:absolute;bottom:16px;left:0;right:0;display:flex;justify-content:center;gap:6px;z-index:100}
+.dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.3);transition:.3s}
+.dot.active{background:#38bdf8;width:20px;border-radius:3px}
+.version{position:absolute;bottom:4px;right:8px;font-size:.6rem;color:#475569}
+
+/* Glass Buttons */
+.glass-btn{position:relative;background:linear-gradient(145deg,rgba(255,255,255,.15),rgba(255,255,255,.05));backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.3);border-top:1px solid rgba(255,255,255,.5);border-radius:16px;padding:12px 20px;color:#fff;font-weight:600;font-size:.9rem;cursor:pointer;transition:all .15s ease;box-shadow:0 8px 32px rgba(0,0,0,.3),0 0 0 1px rgba(255,255,255,.1) inset,0 0 20px rgba(56,189,248,.2);display:flex;align-items:center;justify-content:center;gap:8px}
+.glass-btn::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.6),transparent);border-radius:16px 16px 0 0}
+.glass-btn:active{transform:translateY(2px) scale(.98);box-shadow:0 4px 16px rgba(0,0,0,.3),0 0 10px rgba(56,189,248,.3)}
+.glass-btn.primary{background:linear-gradient(145deg,rgba(56,189,248,.25),rgba(56,189,248,.1));border-color:rgba(56,189,248,.5);box-shadow:0 8px 32px rgba(56,189,248,.25),0 0 25px rgba(56,189,248,.4)}
+.glass-btn.secondary{background:linear-gradient(145deg,rgba(255,255,255,.1),rgba(255,255,255,.03))}
+.glass-btn.danger{background:linear-gradient(145deg,rgba(239,68,68,.2),rgba(239,68,68,.08));border-color:rgba(239,68,68,.4)}
+
+/* Page 1: Intro */
+.page1{background:#000}
+.layers{position:absolute;top:0;left:0;width:100%;height:100%}
+.layers img,.layers video{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover}
+.bottom-brand{position:absolute;bottom:80px;left:0;right:0;display:flex;align-items:center;justify-content:center;gap:10px;z-index:25;opacity:0;animation:fadeIn 1s ease .8s forwards}
+.logo{width:40px;height:40px;border-radius:10px;filter:drop-shadow(0 0 12px rgba(56,189,248,.7));animation:pulse 2s infinite}
+.brand-text{color:#38bdf8;font-size:1.15rem;font-weight:600;white-space:nowrap}
+@keyframes pulse{0%,100%{filter:drop-shadow(0 0 12px rgba(56,189,248,.7))}50%{filter:drop-shadow(0 0 20px rgba(56,189,248,.95))}}
+@keyframes fadeIn{to{opacity:1}}
+.sound-btn{position:absolute;top:18px;left:18px;z-index:30;padding:10px 18px;font-size:.95rem}
+
+/* Page 2: Instructions */
+.page2{background:linear-gradient(180deg,#0f172a,#1e293b);padding:24px 20px;overflow-y:auto;display:flex;flex-direction:column;scrollbar-width:none;-ms-overflow-style:none}
+.page2::-webkit-scrollbar{display:none}
+.h2{color:#38bdf8;font-size:1.4rem;text-align:center;margin-bottom:4px}
+.h2+p{color:#94a3b8;font-size:.8rem;text-align:center;margin-bottom:20px}
+.step{background:rgba(255,255,255,.05);border-radius:12px;padding:12px;margin-bottom:12px;border-left:3px solid #3b82f6}
+.step-n{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;background:#3b82f6;border-radius:50%;font-weight:700;font-size:.75rem;margin-right:8px;color:#fff}
+.step-t{font-weight:600;color:#e6eaf3;font-size:.85rem;margin-bottom:3px}
+.step-d{color:#94a3b8;font-size:.75rem;line-height:1.4}
+.warn{background:rgba(249,115,22,.15);border-left:3px solid #f97316;padding:10px;border-radius:10px;margin:14px 0}
+.warn b{color:#fbbf24;display:block;margin-bottom:3px;font-size:.8rem}
+.warn p{color:#fcd34d;font-size:.7rem;line-height:1.4}
+.support{background:linear-gradient(145deg,rgba(56,189,248,.12),rgba(56,189,248,.04));border:1px solid rgba(56,189,248,.3);border-radius:16px;padding:16px;margin:16px 0}
+.sup-t{display:flex;align-items:center;gap:8px;color:#38bdf8;font-weight:700;font-size:1rem;margin-bottom:10px}
+.heart{font-size:1.3rem;animation:beat 1.5s infinite}
+@keyframes beat{0%,100%{transform:scale(1)}50%{transform:scale(1.15)}}
+.sup-p{color:#cbd5e1;font-size:.8rem;line-height:1.5;margin-bottom:12px}
+.phone{background:rgba(0,0,0,.3);border-radius:12px;padding:12px;margin:10px 0}
+.phone-l{color:#94a3b8;font-size:.7rem;margin-bottom:6px}
+.phone-n{display:flex;align-items:center;gap:8px}
+.phone-num{font-size:1.1rem;font-weight:700;color:#fff;letter-spacing:1px}
+.copy{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.3);border-radius:8px;padding:6px 12px;color:#cbd5e1;font-size:.75rem;cursor:pointer}
+.copy.copied{background:#10b981;border-color:#10b981;color:#fff}
+.sup-note{color:#94a3b8;font-size:.7rem;margin:8px 0 12px}
+.sup-thx{color:#10b981;font-weight:600;font-size:.85rem;margin-bottom:14px}
+.cat{display:flex;align-items:center;gap:6px;color:#38bdf8;text-decoration:none;font-size:.8rem;font-weight:500;padding:10px;border-radius:10px;background:rgba(56,189,248,.1)}
+.btn-start{width:100%;margin-top:auto;padding:16px;font-size:1rem}
+
+/* Page 3: Measurement */
+.page3{background:#0b1120;padding:16px;display:flex;flex-direction:column}
+.head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.head h2{color:#38bdf8;font-size:1.2rem}
+.vf{position:relative;background:#000;border-radius:12px;height:300px;margin-bottom:14px;overflow:hidden}
+.vf video{width:100%;height:100%;object-fit:cover}
+.roi{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:80px;height:80px;border:2px solid #38bdf8;border-radius:8px;box-shadow:0 0 0 999px rgba(0,0,0,.5);z-index:5;transition:border-color .3s}
+.roi::after{content:'🎯 ЗОНА';position:absolute;bottom:-22px;left:50%;transform:translateX(-50%);font-size:8px;color:#38bdf8;white-space:nowrap;background:#000;padding:2px 6px;border-radius:10px}
+.lux-box{text-align:center;padding:16px 0;background:rgba(56,189,248,.1);border-radius:12px;margin-bottom:14px;transition:all .2s ease}
+.lux-box.pulse{transform:scale(1.02);box-shadow:0 0 30px rgba(56,189,248,.25)}
+.lux-val{font-size:2.5rem;font-weight:800;color:#38bdf8;font-family:monospace;display:inline-flex;align-items:center;gap:8px}
+.quality-indicator{font-size:1.3rem}
+.lux-lab{color:#94a3b8;font-size:.7rem;margin-top:4px}
+.metr{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+.m-b{background:rgba(255,255,255,.05);padding:10px;border-radius:10px;text-align:center;cursor:pointer}
+.m-b:active{background:rgba(255,255,255,.1)}
+.m-l{font-size:.6rem;color:#94a3b8;margin-bottom:3px}
+.m-v{font-size:.9rem;font-weight:700;color:#e6eaf3}
+.ctrl{display:flex;gap:8px;margin-bottom:12px}
+.ctrl .glass-btn{padding:12px;font-size:.85rem;flex:1}
+#calib{background:rgba(56,189,248,.1);padding:12px;border-radius:10px;margin-top:10px;display:none}
+.calib-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.calib-title{color:#38bdf8;font-size:.85rem;font-weight:600}
+.calib-close{background:none;border:none;color:#94a3b8;font-size:1.2rem;cursor:pointer;padding:0 4px}
+.calib-steps{font-size:.7rem;color:#cbd5e1;line-height:1.5;margin-bottom:10px}
+.calib-steps b{color:#38bdf8}
+.calib-preview{display:flex;gap:8px;margin:10px 0}
+.calib-preview div{flex:1;text-align:center;padding:8px;border-radius:8px;background:rgba(0,0,0,.3)}
+.calib-preview .label{font-size:.65rem;color:#94a3b8;display:block;margin-bottom:4px}
+.calib-preview .val{font-size:1rem;font-weight:700;color:#fff}
+.calib-slider{width:100%;margin:8px 0}
+.calib-values{display:flex;justify-content:space-between;font-size:.7rem;color:#94a3b8;margin:4px 0 8px}
+.calib-actions{display:flex;gap:8px;margin-top:10px}
+.calib-actions button{flex:1;padding:10px;font-size:.85rem}
+.quality-box{background:rgba(0,0,0,.5);border-radius:10px;padding:10px;margin-top:12px}
+.quality-bar{height:4px;background:#2a3a5a;border-radius:4px;overflow:hidden;margin:6px 0}
+.quality-fill{height:100%;width:0%;transition:width .3s;background:linear-gradient(90deg,#ef4444 0%,#f59e0b 50%,#10b981 100%)}
+.toast{position:fixed;bottom:60px;left:50%;transform:translateX(-50%);background:#10b981;color:#fff;padding:10px 20px;border-radius:12px;font-size:.8rem;opacity:0;pointer-events:none;transition:opacity .3s;z-index:200}
+.toast.show{opacity:1}
+</style>
+</head>
+<body>
+<div class="screen">
+
+<!-- СТРАНИЦА 1: ИНТРО -->
+<div class="page page1 active" id="p1">
+  <div class="layers">
+    <img id="ph" src="frame.jpg" style="z-index:2">
+    <video id="vid" src="cube.mp4" muted playsinline preload="auto" style="z-index:1"></video>
+  </div>
+  <div class="bottom-brand">
+    <img src="favicon.ico" class="logo" onerror="this.style.display='none'">
+    <div class="brand-text">Анти-ИИ Свет</div>
+  </div>
+  <button id="snd" class="glass-btn sound-btn"><span style="font-size:1.3rem">🔇</span><span>Звук</span></button>
+</div>
+
+<!-- СТРАНИЦА 2: ИНСТРУКЦИЯ -->
+<div class="page page2" id="p2">
+  <!-- ЛОГОТИП + ЗАГОЛОВОК В ОДНУ СТРОКУ -->
+  <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:16px;">
+    <img src="favicon.ico" style="width:40px;height:40px;border-radius:10px;filter:drop-shadow(0 0 12px rgba(56,189,248,.7));animation:pulse 2s infinite" onerror="this.style.display='none'">
+    <div class="h2" style="margin:0;">📖 Как пользоваться</div>
+  </div>
+  <p>Честное измерение света в люксах</p>
+  
+  <div class="step"><div><span class="step-n">1</span><span class="step-t">Отключите улучшения камеры</span></div><div class="step-d">Выключите HDR, Night Mode в настройках телефона.</div></div>
+  <div class="step"><div><span class="step-n">2</span><span class="step-t">Заблокируйте экспозицию</span></div><div class="step-d">Нажмите и ДЕРЖИТЕ 2 секунды на экране камеры → появится 🔒</div></div>
+  <div class="step"><div><span class="step-n">3</span><span class="step-t">Наведите синюю рамку</span></div><div class="step-d">Измеряется ТОЛЬКО центр (80×80 пикселей). Края игнорируются.</div></div>
+  <div class="step"><div><span class="step-n">4</span><span class="step-t">Калибровка</span></div><div class="step-d">Ручная: ползунок на известное значение. Или авто: нажмите «🤖» с белым листом.</div></div>
+  
+  <div class="warn"><b>⚠️ Важно</b><p>Браузер не даёт RAW-сигнал. Отключите авто-улучшения для точности.</p></div>
+  
+  <div class="support">
+    <div class="sup-t"><span class="heart">💙</span>ПОДДЕРЖАТЬ ПРОЕКТ</div>
+    <p class="sup-p">Приложение бесплатное. Было и останется.</p>
+    <p class="sup-p">Если проект помог — поддержите разработку добровольным переводом.</p>
+    <div class="phone">
+      <div class="phone-l">📱 ПЕРЕВОД ПО НОМЕРУ:</div>
+      <div class="phone-n">
+        <span class="phone-num" id="pn">8-920-227-56-76</span>
+        <button class="copy" id="cp" onclick="cpy()">📋 Копировать</button>
+      </div>
+    </div>
+    <p class="sup-note">✅ Мгновенно. Без комиссии. Безопасно.</p>
+    <p class="sup-thx">❤️ Спасибо!</p>
+    <a href="https://ancf-hue.github.io/" target="_blank" class="cat">🌟 Каталог Anti-AI Shield →</a>
+  </div>
+  
+  <button class="glass-btn primary btn-start" onclick="go(3)">🚀 Начать измерение</button>
+</div>
+
+<!-- СТРАНИЦА 3: ИЗМЕРЕНИЕ -->
+<div class="page page3" id="p3">
+  <div class="head">
+    <h2>📐 Измерение</h2>
+    <button class="glass-btn secondary" onclick="go(2)" style="padding:8px 14px;font-size:.8rem">← Назад</button>
+  </div>
+  <div class="vf"><video id="cam" autoplay playsinline muted></video><div class="roi"></div></div>
+  <div class="lux-box" id="luxBox">
+    <div class="lux-val"><span id="lv">— лк</span><span class="quality-indicator" id="qIcon">⚪</span></div>
+    <div class="lux-lab">Освещённость (ориентировочно)</div>
+  </div>
+  <div class="metr">
+    <div class="m-b" onclick="alert('Сырой сигнал: 0–255, яркость матрицы до обработки')"><div class="m-l">Сырой ⓘ</div><div class="m-v" id="rv">0</div></div>
+    <div class="m-b" onclick="alert('Качество: ✅>70 🟡40-70 🔴<40 — точность замера')"><div class="m-l">Качество ⓘ</div><div class="m-v" id="qs">—</div></div>
+    <div class="m-b" onclick="alert('Стабильность: если «АВТО» — зажмите экран 2 сек для 🔒')"><div class="m-l">Стабильность ⓘ</div><div class="m-v" id="st">—</div></div>
+  </div>
+  <div class="ctrl">
+    <button class="glass-btn primary" id="sb" onclick="startCam()">📷 Запустить</button>
+    <button class="glass-btn secondary" id="cb" onclick="togCalib()">⚙️ Калибровка</button>
+  </div>
+  
+  <!-- ПАНЕЛЬ КАЛИБРОВКИ -->
+  <div id="calib">
+    <div class="calib-header">
+      <span class="calib-title">🎚️ Калибровка</span>
+      <button class="calib-close" onclick="togCalib()">✕</button>
+    </div>
+    <div class="calib-steps"><b>Ручная:</b> 1) Белый лист под лампу 2) Наведите рамку 3) Ползунок на ~250 лк 4) Применить</div>
+    <div class="calib-preview"><div><span class="label">Сейчас</span><span class="val" id="calRaw">—</span></div><div><span class="label">После</span><span class="val" id="calLux">—</span></div></div>
+    <input type="range" min="50" max="1000" step="10" value="250" class="calib-slider" id="ls" oninput="updCalibPreview()">
+    <div class="calib-values"><span>🌙50</span><span>💡250</span><span>🌅500</span><span>☀️1000</span></div>
+    <div style="text-align:center;color:#38bdf8;font-size:1.2rem;font-weight:700;margin:6px 0" id="slv">250 лк</div>
+    <div style="font-size:.65rem;color:#aaa;text-align:center;margin:8px 0">💡 Лампа 60Вт на 30 см ≈ 250 лк</div>
+    <div class="calib-actions">
+      <button class="glass-btn danger" onclick="resetCalib()">🗑️ Сброс</button>
+      <button class="glass-btn primary" onclick="savCalib()">✅ Применить</button>
+    </div>
+    <button class="glass-btn primary" onclick="runAutoCalib()" style="width:100%;margin-top:10px;background:linear-gradient(145deg,#3b82f6,#1d4ed8)">🤖 Авто-калибровка по белому листу</button>
+  </div>
+  
+  <div class="quality-box">
+    <div class="quality-bar"><div class="quality-fill" id="qf"></div></div>
+    <div style="display:flex;justify-content:space-between;font-size:.6rem;color:#aaa"><span>🔴</span><span>🟡</span><span>🟢</span><span>🟡</span><span>🔴</span></div>
+    <div style="font-size:.65rem;color:#aaa;text-align:center;margin-top:8px" id="tipText">💡 Зажмите экран 2 сек → 🔒 блокировка экспозиции</div>
+  </div>
+</div>
+
+<div class="dots"><div class="dot active" id="d1"></div><div class="dot" id="d2"></div><div class="dot" id="d3"></div></div>
+<div class="toast" id="ts">✓ Готово!</div>
+<div class="version">v1.2</div>
+
+</div>
+
+<script>
+// ========== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ==========
+let currentPage=1,stream=null,anim=null,cal=null,K=1.0,smoothedLux=0,lastLux=0,lastAvgLum=0,exposureLockDetected=false,cameraActive=false,rawHistory=[];
+const cam=document.getElementById('cam'),cvs=document.createElement('canvas'),ctx=cvs.getContext('2d',{willReadFrequently:true});
+
+// ========== НАВИГАЦИЯ ==========
+function go(n){if(currentPage===3&&n!==3)stopCamera();document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.dot').forEach(d=>d.classList.remove('active'));document.getElementById('p'+n).classList.add('active');document.getElementById('d'+n).classList.add('active');currentPage=n;if(n===3)startCam()}
+
+// ========== СТРАНИЦА 1 ==========
+const ph=document.getElementById('ph'),vid=document.getElementById('vid'),snd=document.getElementById('snd');let sOn=false,vStart=false;
+snd.onclick=()=>{sOn=!sOn;vid.muted=!sOn;snd.innerHTML=sOn?'<span style="font-size:1.3rem">🔊</span><span>Выкл</span>':'<span style="font-size:1.3rem">🔇</span><span>Звук</span>'};
+function swV(){if(vStart)return;vStart=true;vid.style.zIndex='2';ph.style.zIndex='1';vid.play().catch(()=>{});setTimeout(()=>go(2),5000)}
+if(ph.complete)setTimeout(swV,2000);else{ph.onload=()=>setTimeout(swV,2000)}
+
+// ========== КОПИРОВАНИЕ С FALLBACK ==========
+function cpy(){const n=document.getElementById('pn').innerText.replace(/-/g,''),ts=document.getElementById('ts'),btn=document.getElementById('cp');const ok=()=>{btn.classList.add('copied');btn.innerText='✓ Скопировано';ts.classList.add('show');setTimeout(()=>{btn.classList.remove('copied');btn.innerText='📋 Копировать';ts.classList.remove('show')},2000)};if(navigator.clipboard?.writeText){navigator.clipboard.writeText(n).then(ok).catch(()=>fallback(n,ok))}else fallback(n,ok)}
+function fallback(t,cb){const a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();try{document.execCommand('copy');cb()}catch(e){prompt("Скопируйте:",t)}document.body.removeChild(a)}
+
+// ========== КАМЕРА: ЗАПУСК/СТОП ==========
+async function startCam(){if(!navigator.mediaDevices){alert('Камера не поддерживается');return}try{stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment',width:{ideal:640}}});cam.srcObject=stream;await cam.play();cvs.width=160;cvs.height=120;cameraActive=true;document.getElementById('sb').disabled=true;document.getElementById('sb').innerHTML='📷 Работает';requestAnimationFrame(loop)}catch(e){if(e.name==='NotAllowedError')alert('🚫 Доступ запрещён. Разрешите камеру в настройках браузера (иконка 🔒) и обновите страницу.');else alert('Ошибка: '+e.message)}}
+function stopCamera(){cameraActive=false;if(stream){stream.getTracks().forEach(t=>t.stop());stream=null}if(anim)cancelAnimationFrame(anim);anim=null;document.getElementById('sb').disabled=false;document.getElementById('sb').innerHTML='📷 Запустить'}
+function onVisibilityChange(){if(document.hidden&&currentPage===3)stopCamera();else if(!document.hidden&&currentPage===3&&!cameraActive)startCam()}
+document.addEventListener('visibilitychange',onVisibilityChange);
+
+// ========== ОСНОВНОЙ ЦИКЛ ==========
+function loop(){if(!cameraActive)return;if(!cam.readyState||cam.readyState<2){anim=requestAnimationFrame(loop);return}ctx.drawImage(cam,0,0,cvs.width,cvs.height);const data=ctx.getImageData(40,30,80,60).data;let sum=0,clipL=0,clipH=0,rS=0,gS=0,bS=0;for(let i=0;i<data.length;i+=4){const r=data[i],g=data[i+1],b=data[i+2],lum=0.2126*r+0.7152*g+0.0722*b;sum+=lum;rS+=r;gS+=g;bS+=b;if(r<15&&g<15&&b<15)clipL++;if(r>240&&g>240&&b>240)clipH++}const avgLum=sum/(80*60),over=clipH/(80*60)*100,under=clipL/(80*60)*100;const isChanging=Math.abs(avgLum-lastAvgLum)>25;lastAvgLum=avgLum;if(isChanging)exposureLockDetected=false;if(!isChanging&&rawHistory.length>25&&!exposureLockDetected){exposureLockDetected=true;showToast("🔒 Экспозиция стабильна")}rawHistory.push(avgLum);if(rawHistory.length>30)rawHistory.shift();let lux=Math.pow(Math.min(0.98,Math.max(0.02,avgLum/255)),1.8)*1200*K;const cb=(rS+gS+bS)/3/Math.max(1,Math.max(rS,gS,bS)/255);if(cb<0.7)lux*=0.85;lux=Math.min(2000,Math.max(0,lux));smoothedLux=smoothedLux===0?lux:smoothedLux*0.9+lux*0.1;const score=Math.max(0,Math.min(100,100-(over>20?40:over>10?20:0)-(under>20?35:under>10?15:0)-(smoothedLux<70?75:smoothedLux<100?50:smoothedLux>800?40:0)));const qIcon=score>70?'✅':score>40?'⚠️':'❌';const lv=document.getElementById('lv');lv.innerHTML=Math.round(smoothedLux)+' лк';document.getElementById('qIcon').innerText=qIcon;document.getElementById('rv').innerText=Math.round(avgLum);document.getElementById('qs').innerText=score>70?'🟢':score>40?'🟡':'';document.getElementById('st').innerText=isChanging?"⚠️ АВТО! Зажмите 2 сек":"✅ Стабильно";document.getElementById('qf').style.width=score+'%';const tip=document.getElementById('tipText'),roi=document.querySelector('.roi');if(over>15){tip.innerHTML='⚠️ ПЕРЕСВЕТ! Отвернитесь';tip.style.color='#f97316';roi.style.borderColor='#ef4444'}else if(under>15){tip.innerHTML='⚠️ ТЕМНО! Включите лампу';tip.style.color='#f97316';roi.style.borderColor='#ef4444'}else{tip.innerHTML='💡 Зажмите экран 2 сек → 🔒';tip.style.color='#aaa';roi.style.borderColor='#38bdf8'}const lb=document.getElementById('luxBox');if(Math.abs(smoothedLux-lastLux)>3){lb.classList.add('pulse');setTimeout(()=>lb.classList.remove('pulse'),200)}lastLux=smoothedLux;if(cameraActive)anim=requestAnimationFrame(loop)}
+
+// ========== КАЛИБРОВКА ==========
+function togCalib(){const p=document.getElementById('calib');p.style.display=p.style.display==='block'?'none':'block';if(p.style.display==='block'){updCalibPreview();const s=localStorage.getItem('aai_calib');if(s){try{const c=JSON.parse(s);document.getElementById('ls').value=c.lux;document.getElementById('slv').innerText=c.lux+' лк'}catch(e){}}}}
+function updCalibPreview(){const raw=parseInt(document.getElementById('rv').innerText)||50,ref=parseInt(document.getElementById('ls').value);document.getElementById('slv').innerText=ref+' лк';document.getElementById('calRaw').innerText=raw;const preview=Math.round(raw*ref/250);document.getElementById('calLux').innerText=preview+' лк'}
+function savCalib(){const ref=parseInt(document.getElementById('ls').value),raw=parseInt(document.getElementById('rv').innerText)||50;if(raw<10){alert('Подождите стабилизации');return}K=Math.min(2.5,Math.max(0.5,ref/(Math.pow(raw/255,1.8)*1200)));cal={lux:ref,raw:raw,K:K,date:new Date().toLocaleDateString('ru-RU')};localStorage.setItem('aai_calib',JSON.stringify(cal));togCalib();const btn=document.getElementById('cb');btn.innerHTML='✅ '+ref+' лк';btn.style.background='#166534';setTimeout(()=>btn.style.background='',1500);showToast('Калибровка сохранена!')}
+function resetCalib(){if(!confirm('Сбросить калибровку?'))return;localStorage.removeItem('aai_calib');K=1.0;document.getElementById('cb').innerHTML='⚙️ Калибровка';document.getElementById('cb').style.background='';showToast('Калибровка сброшена')}
+function runAutoCalib(){const raw=parseInt(document.getElementById('rv').innerText)||0;if(raw<40){alert('Слишком темно! Наведите на белый лист под лампой.');return}if(raw>240){alert('Слишком ярко! Уберите пересвет.');return}const target=250;K=target/(Math.pow(raw/255,1.8)*1200);K=Math.min(3,Math.max(0.3,K));cal={lux:target,raw:raw,K:K,date:new Date().toLocaleDateString('ru-RU')};localStorage.setItem('aai_calib',JSON.stringify(cal));document.getElementById('cb').innerHTML='✅ '+target+' лк';showToast('🤖 Авто-калибровка: '+target+' лк');togCalib()}
+function showToast(m){const t=document.getElementById('ts');t.innerText='✓ '+m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2000)}
+
+// Загрузка калибровки
+const sv=localStorage.getItem('aai_calib');if(sv){try{cal=JSON.parse(sv);K=cal.K||1.0;const cb=document.getElementById('cb');cb.innerHTML='✅ '+cal.lux+' лк';cb.style.background='#166534'}catch(e){}}
+</script>
+</body>
+</html>
