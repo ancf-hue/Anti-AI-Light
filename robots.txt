@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /?*
+Disallow: /#*
+
+Sitemap: https://anti-ai-light.ru/sitemap.xml
+Host: https://anti-ai-light.ru

@@ -1,0 +1,7 @@
+# https://anti-ai-light.ru/security.txt
+
+Contact: mailto:anti-ai@example.com
+Contact: tel:+7-920-227-56-76
+Expires: 2027-01-01T00:00:00.000Z
+Preferred-Languages: ru
+Canonical: https://anti-ai-light.ru/security.txt
