@@ -1,7 +1,20 @@
+# Разрешить индексацию всего сайта
 User-agent: *
 Allow: /
-Disallow: /?*
-Disallow: /#*
 
-Sitemap: https://anti-ai-light.ru/sitemap.xml
-Host: https://anti-ai-light.ru
+# Указать путь к sitemap
+Sitemap: https://anti-ai-light.vercel.app/sitemap.xml
+
+# Яндекс бот
+User-agent: Yandex
+Allow: /
+Host: https://anti-ai-light.vercel.app
+
+# Google бот
+User-agent: Googlebot
+Allow: /
+
+# Запретить индексацию служебных страниц (при необходимости)
+Disallow: /api/
+Disallow: /_next/
+Disallow: /static/
